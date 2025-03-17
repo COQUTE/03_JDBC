@@ -1,5 +1,7 @@
 package jdbcEx;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,7 +19,8 @@ public class Exercise1 {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		
+		FileWriter fw = null;
+		BufferedWriter bw = null;
 		
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -48,10 +51,23 @@ public class Exercise1 {
 			
 			rs = pstmt.executeQuery();
 			
+			StringBuilder sb = new StringBuilder();
+			
 			while(rs.next()) {
 				
-				System.out.printf("%s, %s\n", rs.getString(1), rs.getString(2));
+				sb.append(rs.getString(1));
+				sb.append(rs.getString(2));
+				sb.append("\n");
 			}
+			
+			String result = sb.toString();
+			
+			fw = new FileWriter("/io_test/20250305/스터디.txt");
+			bw = new BufferedWriter(fw);
+			
+			bw.write(result);
+			
+			bw.flush();
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -61,6 +77,8 @@ public class Exercise1 {
 				if(rs != null) rs.close();
 				if(pstmt != null) pstmt.close();
 				if(conn != null) conn.close();
+				
+				if(bw != null) fw.close();
 				
 			} catch(Exception e) {
 				e.printStackTrace();
