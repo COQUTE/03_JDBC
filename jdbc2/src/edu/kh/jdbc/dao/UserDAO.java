@@ -72,7 +72,7 @@ public class UserDAO {
 						userId, 
 						userPw, 
 						userName, 
-						enrollDate.toString() );
+						enrollDate.toString());
 				
 			}
 			
