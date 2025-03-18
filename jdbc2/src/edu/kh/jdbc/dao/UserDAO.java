@@ -1,14 +1,17 @@
 package edu.kh.jdbc.dao;
 
+// import static : 지정된 경로에 존재하는 static 구문을 모두 얻어와
+// 클래스명.메서드명() 이 아닌 메서드명() 만 작성해도 호출 가능하게 함.
+import static edu.kh.jdbc.common.JDBCTemplate.close;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
-// import static : 지정된 경로에 존재하는 static 구문을 모두 얻어와
-// 클래스명.메서드명() 이 아닌 메서드명() 만 작성해도 호출 가능하게 함.
-import static edu.kh.jdbc.common.JDBCTemplate.*;
 import edu.kh.jdbc.dto.User;
 
 // (Model 중 하나)DAO (Data Access Object)
@@ -115,6 +118,41 @@ public class UserDAO {
 		}
 		
 		return result;
+	}
+
+	public List<User> selectAll(Connection conn) {
+		
+		List<User> userList = new ArrayList<User>();
+		
+		try {
+			// sql 작성
+			String query = "SELECT * FROM TB_USER";
+			
+			stmt = conn.createStatement();
+			
+			rs = stmt.executeQuery(query);
+			
+			boolean flag = true;
+			
+			while(rs.next()) {
+				flag = false;
+				
+				userList.add(new User(rs.getInt("USER_NO"), rs.getString("USER_ID"), rs.getString("USER_PW"), rs.getString("USER_NAME"), rs.getString("ENROLL_DATE")));
+			}
+			
+			if(flag) {
+				System.out.println("조회 결과 없음");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			close(rs);
+			close(stmt);
+		}
+		
+		return userList;
 	}
 	
 }

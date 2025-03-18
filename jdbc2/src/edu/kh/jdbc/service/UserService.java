@@ -1,6 +1,7 @@
 package edu.kh.jdbc.service;
 
 import java.sql.Connection;
+import java.util.List;
 
 import edu.kh.jdbc.common.JDBCTemplate;
 import edu.kh.jdbc.dao.UserDAO;
@@ -64,6 +65,21 @@ public class UserService {
 		
 		// 6. 결과를 view 리턴
 		return result;
+	}
+
+	public List<User> selectAll() {
+		
+		// 커넥션 생성
+		Connection conn = JDBCTemplate.getConnection();
+		
+		// DAO 메서드 호출 결과 반환
+		List<User> userList = dao.selectAll(conn);
+		
+		// 다 쓴 커넥션 자원 반환
+		JDBCTemplate.close(conn);
+		
+		// 결과를 view 리턴
+		return userList;
 	}
 	
 	

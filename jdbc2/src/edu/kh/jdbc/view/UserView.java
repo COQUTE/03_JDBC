@@ -1,6 +1,8 @@
 package edu.kh.jdbc.view;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 import edu.kh.jdbc.dto.User;
@@ -64,7 +66,7 @@ public class UserView {
 
 				switch (input) {
 				case 1: insertUser(); break;
-//				case 2: selectAll(); break;
+				case 2: selectAll(); break;
 //				case 3: selectName(); break;
 //				case 4: selectUser(); break;
 //				case 5: deleteUser(); break;
@@ -111,6 +113,15 @@ public class UserView {
 			System.out.println("User 등록 성공");
 		} else { // 실패
 			System.out.println("User 등록 실패");
+		}
+	}	
+
+	private void selectAll() {
+		
+		List<User> userList = service.selectAll();
+		
+		for(User user : userList) {
+			System.out.println(user);
 		}
 	}
 
