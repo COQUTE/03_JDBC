@@ -1,5 +1,8 @@
 package edu.kh.jdbc.service;
 
+import static edu.kh.jdbc.common.JDBCTemplate.commit;
+import static edu.kh.jdbc.common.JDBCTemplate.rollback;
+
 import java.sql.Connection;
 import java.util.List;
 
@@ -80,6 +83,65 @@ public class UserService {
 		
 		// 결과를 view 리턴
 		return userList;
+	}
+
+	public List<User> selectName(String input) {
+		
+		// 커넥션 생성
+		Connection conn = JDBCTemplate.getConnection();
+		
+		List<User> userList = dao.selectName(conn, input);
+		
+		JDBCTemplate.close(conn);
+		
+		return userList;
+	}
+
+	public User selectUser(int input) {
+		
+		Connection conn = JDBCTemplate.getConnection();
+		
+		User user = dao.selectUser(conn, input);
+		
+		JDBCTemplate.close(conn);
+		
+		return user;
+	}
+
+	public int deleteUser(int iuput) {
+		
+		Connection conn = JDBCTemplate.getConnection();
+		
+		int result = dao.deleteUser(conn, iuput);
+		
+		if (result > 0) {
+			commit(conn);
+		} else {
+			rollback(conn);
+		}
+		
+		JDBCTemplate.close(conn);
+		
+		return result;
+	}
+
+	public int updateName(String userId, String userPw, String userName) {
+		
+		Connection conn = JDBCTemplate.getConnection();
+		
+		User user = new User(0, userId, userPw, userName, null);
+		
+		int result = dao.updateName(conn, user);
+		
+		if (result > 0) {
+			commit(conn);
+		} else {
+			rollback(conn);
+		}
+		
+		JDBCTemplate.close(conn);
+		
+		return result;
 	}
 	
 	

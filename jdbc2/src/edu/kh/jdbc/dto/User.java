@@ -20,7 +20,6 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class User {
 	private int userNo;
 	private String userId;
@@ -36,4 +35,9 @@ public class User {
 	// toString()..
 	// -> 보일러 플레이트 코드
 	
+	@Override
+	public String toString() {
+		
+		return String.format("%-7d | %-7s | %-7s | %-6s | %s", userNo, userId, userPw, userName, enrollDate);
+	}
 }

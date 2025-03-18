@@ -2,7 +2,7 @@ package edu.kh.jdbc.dao;
 
 // import static : 지정된 경로에 존재하는 static 구문을 모두 얻어와
 // 클래스명.메서드명() 이 아닌 메서드명() 만 작성해도 호출 가능하게 함.
-import static edu.kh.jdbc.common.JDBCTemplate.close;
+import static edu.kh.jdbc.common.JDBCTemplate.*;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -122,7 +122,7 @@ public class UserDAO {
 
 	public List<User> selectAll(Connection conn) {
 		
-		List<User> userList = new ArrayList<User>();
+		List<User> userList = null;
 		
 		try {
 			// sql 작성
@@ -132,16 +132,16 @@ public class UserDAO {
 			
 			rs = stmt.executeQuery(query);
 			
-			boolean flag = true;
-			
-			while(rs.next()) {
-				flag = false;
+			if(!rs.isBeforeFirst()) {
+				System.out.println("조회 결과 없음");
 				
-				userList.add(new User(rs.getInt("USER_NO"), rs.getString("USER_ID"), rs.getString("USER_PW"), rs.getString("USER_NAME"), rs.getString("ENROLL_DATE")));
+				return userList;
 			}
 			
-			if(flag) {
-				System.out.println("조회 결과 없음");
+			userList = new ArrayList<User>();
+			
+			while(rs.next()) {
+				userList.add(new User(rs.getInt("USER_NO"), rs.getString("USER_ID"), rs.getString("USER_PW"), rs.getString("USER_NAME"), rs.getDate("ENROLL_DATE").toString()));
 			}
 			
 		} catch (Exception e) {
@@ -153,6 +153,116 @@ public class UserDAO {
 		}
 		
 		return userList;
+	}
+
+	public List<User> selectName(Connection conn, String input) {
+		
+		List<User> userList = null;
+		
+		try {
+			String query = "SELECT * FROM TB_USER WHERE USER_NAME LIKE '%" + input + "%'";
+			
+			stmt = conn.createStatement();
+			
+			rs = stmt.executeQuery(query);
+			
+			if(!rs.isBeforeFirst()) {
+				return userList;
+			}
+			
+			userList = new ArrayList<User>();
+			
+			while(rs.next()) {
+				userList.add(new User(rs.getInt("USER_NO"), rs.getString("USER_ID"), rs.getString("USER_PW"), rs.getString("USER_NAME"), rs.getDate("ENROLL_DATE").toString()));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		
+		return userList;
+	}
+
+	public User selectUser(Connection conn, int input) {
+		
+		User user = null;
+		
+		try {
+			String query = "SELECT * FROM TB_USER WHERE USER_NO = ?";
+			
+			pstmt = conn.prepareStatement(query);
+			
+			pstmt.setInt(1, input);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				user = new User(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDate(5).toString());
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		
+		return user;
+	}
+
+	public int deleteUser(Connection conn, int input) {
+		
+		int result = 0;
+		
+		try {
+		
+		String query = "DELETE FROM TB_USER WHERE USER_NO = ?";
+		
+		pstmt = conn.prepareStatement(query);
+		
+		pstmt.setInt(1, input);
+		
+		result = pstmt.executeUpdate();
+		
+		} catch(Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		
+		return result;
+	}
+
+	public int updateName(Connection conn, User user) {
+		
+		int result = 0;
+		
+		try {
+			String query = "UPDATE TB_USER SET USER_NAME = ? WHERE USER_ID = ? AND USER_PW = ?";
+			
+			pstmt = conn.prepareStatement(query);
+			
+			pstmt.setString(1, user.getUserName());
+			pstmt.setString(2, user.getUserId());
+			pstmt.setString(3, user.getUserPw());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			close(pstmt);
+		}		
+		
+		return result;
 	}
 	
 }

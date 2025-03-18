@@ -1,6 +1,5 @@
 package edu.kh.jdbc.view;
 
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -64,13 +63,15 @@ public class UserView {
 				input = sc.nextInt();
 				sc.nextLine(); // 버퍼에 남은 개행문자 제거
 
+				System.out.println();
+				
 				switch (input) {
 				case 1: insertUser(); break;
 				case 2: selectAll(); break;
-//				case 3: selectName(); break;
-//				case 4: selectUser(); break;
-//				case 5: deleteUser(); break;
-//				case 6: updateName(); break;
+				case 3: selectName(); break;
+				case 4: selectUser(); break;
+				case 5: deleteUser(); break;
+				case 6: updateName(); break;
 //				case 7: insertUser2(); break;
 //				case 8: multiInsertUser(); break;
 				case 0: System.out.println("\n[프로그램 종료]\n"); break;
@@ -116,13 +117,115 @@ public class UserView {
 		}
 	}	
 
+	/**
+	 * 테이블 컬럼 정보들 출력
+	 */
+	private void display() {
+		
+		System.out.println("USER_NO | USER_ID | USER_PW | USER_NAME | ENROLL_DATE");
+		System.out.println("-----------------------------------------------------");
+	}
+	
+	/**
+	 * User 전체 조회(SELECT)
+	 */
 	private void selectAll() {
 		
 		List<User> userList = service.selectAll();
 		
-		for(User user : userList) {
+		display();
+		
+		if (userList == null) {
+			System.out.println("User 테이블이 비어있습니다.");
+			
+		} else {
+			for(User user : userList) {
+				System.out.println(user);
+			}
+		}
+	}
+	
+	/** 
+	 * User 중 이름에 검색어가 포함된 회원 조회 (SELECT)
+	 */
+	private void selectName() {
+		
+		// 입력된 문자열을 포함하는 이름을 가진 USER 정보 조회
+		System.out.print("이름 검색 : ");
+		String input = sc.next();
+		
+		List<User> userList = service.selectName(input);
+		
+		display();
+		
+		if (userList == null) {
+			System.out.println("일치하는 이름이 없습니다.");
+			
+		} else {
+			for(User user : userList) {
+				System.out.println(user);
+			}
+		}
+	}
+	
+	/**
+	 * USER_NO를 입력 받아 일치하는 User 조회(SELECT)
+	 */
+	private void selectUser() {
+		
+		System.out.print("USER_NO 입력 : ");
+		int input = sc.nextInt();
+		
+		User user = service.selectUser(input);
+		
+		display();
+		
+		if (user == null) {
+			System.out.println("해당 USER_NO가 없습니다.");
+		} else {
 			System.out.println(user);
 		}
 	}
 
+	/**
+	 * USER_NO를 입력 받아 일치하는 User 삭제(DELETE)
+	 */
+	private void deleteUser() {
+		
+		System.out.print("USER_NO 입력 : ");
+		int input = sc.nextInt();
+		
+		int result = service.deleteUser(input);
+		
+		if (result > 0) {
+			System.out.println("삭제 성공");
+		} else {
+			System.out.println("삭제 실패");
+		}
+	}
+	
+	/**
+	 * ID, PW가 일치하는 회원이 있을 경우 이름 수정(UPDATE)
+	 */
+	private void updateName() {
+		
+		System.out.print("USER_ID 입력 : ");
+		String userId = sc.next();
+		
+		System.out.print("USER_PW 입력 : ");
+		String userPw = sc.next();
+		
+		System.out.print("USER_NAME 입력 : ");
+		String userName = sc.next();
+		
+		int result = service.updateName(userId, userPw, userName);
+		
+		if (result > 0) {
+			System.out.println("수정 성공");
+		} else {
+			System.out.println("수정 실패");
+		}
+	}
+	
+	
 }
