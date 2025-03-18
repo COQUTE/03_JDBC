@@ -63,7 +63,7 @@ public class UserView {
 				sc.nextLine(); // 버퍼에 남은 개행문자 제거
 
 				switch (input) {
-//				case 1: insertUser(); break;
+				case 1: insertUser(); break;
 //				case 2: selectAll(); break;
 //				case 3: selectName(); break;
 //				case 4: selectUser(); break;
@@ -93,5 +93,25 @@ public class UserView {
 
 	} // mainMenu() 종료
 
+	private void insertUser() {
+		
+		System.out.print("USER_ID : ");
+		String userId = sc.next();
+		
+		System.out.print("USER_PW : ");
+		String userPw = sc.next();
+		
+		System.out.print("USER_NAME : ");
+		String userName = sc.next();
+		
+		// DML(INSERT를 수행하기 때문에 결과가 int형으로 나옴)
+		int result = service.insertUser(userId, userPw, userName);
+		
+		if(result > 0) { // 성공
+			System.out.println("User 등록 성공");
+		} else { // 실패
+			System.out.println("User 등록 실패");
+		}
+	}
 
 }

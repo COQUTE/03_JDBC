@@ -38,6 +38,33 @@ public class UserService {
 		// 6. 결과를 view 리턴
 		return user;
 	}
+
+	public int insertUser(String userId, String userPw, String userName) {
+		
+		// 1. 커넥션 생성
+		Connection conn = JDBCTemplate.getConnection();
+		
+		// 2. 데이터 가공
+		User user = new User(0, userId, userPw, userName, null);
+		
+		// 3. DAO 메서드 호출 결과 반환
+		int result = dao.insertUser(conn, user);
+		
+		// 4. DML(commit/rollback)
+		if(result > 0) { // INSERT 성공
+			JDBCTemplate.commit(conn);
+			
+		} else { // INSERT 실패
+			JDBCTemplate.rollback(conn);
+			
+		}
+		
+		// 5. 다 쓴 커넥션 자원 반환
+		JDBCTemplate.close(conn);
+		
+		// 6. 결과를 view 리턴
+		return result;
+	}
 	
 	
 	

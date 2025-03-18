@@ -90,5 +90,31 @@ public class UserDAO {
 		
 		return user; // 결과 반환 (생성된 User 객체 또는 null)
 	}
+
+	public int insertUser(Connection conn, User user) {
+		
+		int result = 0;
+		
+		try {
+			// query문 작성
+			String query = "INSERT INTO TB_USER VALUES(SEQ_USER_NO.NEXTVAL,?,?,?,DEFAULT)";
+			
+			pstmt = conn.prepareStatement(query);
+			
+			pstmt.setString(1, user.getUserId());
+			pstmt.setString(2, user.getUserPw());
+			pstmt.setString(3, user.getUserName());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+			
+		} finally {
+			close(pstmt);
+		}
+		
+		return result;
+	}
 	
 }
