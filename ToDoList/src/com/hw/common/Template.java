@@ -1,8 +1,10 @@
 package com.hw.common;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
 
@@ -27,7 +29,7 @@ public class Template {
 			// xml 파일을 읽어와야 하기 때문에 InputStream 생성
 			// driver.xml에 InputStream 연결
 			// 연결된 InputStream을 통해 Properties 객체에 entry 내용들 읽어들임
-			prop.loadFromXML(new FileInputStream("driver.xml"));
+			prop.loadFromXML(new FileInputStream("src/com/hw/resource/driver.xml"));
 			
 			// driver 메모리에 로드
 			Class.forName(prop.getProperty("driver"));
@@ -43,6 +45,33 @@ public class Template {
 		}
 		
 		return conn;
+	}
+	
+	public static Properties getQueryProperties() {
+		
+		Properties prop = null;
+		FileInputStream fis = null;
+		
+		try {
+			prop = new Properties();
+			fis = new FileInputStream("src/com/hw/resource/query.xml");
+			
+			prop.loadFromXML(fis);
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		
+		} finally {
+			
+			try {
+				fis.close();
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return prop;
 	}
 	
 	public static void commit(Connection conn) {
@@ -83,6 +112,17 @@ public class Template {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void close(ResultSet rs) {
+		
+		try {
+			if(rs != null && !rs.isClosed()) rs.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 }

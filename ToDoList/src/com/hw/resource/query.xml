@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="selectCount">SELECT COUNT(*) FROM TB_MEMBER WHERE MEMBER_ID = ?</entry>
+
+	<entry key="selectMember">SELECT MEMBER_CODE FROM TB_MEMBER WHERE MEMBER_ID = ? AND MEMBER_PW = ?</entry>
+
+	<entry key="selectNickname">SELECT NICKNAME FROM TB_MEMBER WHERE MEMBER_CODE = ?</entry>
+	
+	<entry key="selectTodo">SELECT TODO_NO, TODO_TITLE, HAS_DONE, CREATED_DATE FROM TB_TODO WHERE MEMBER_CODE = ?</entry>
+	
+	<entry key="insertMember">INSERT INTO TB_MEMBER VALUES(SEQ_MEMBER_CODE.NEXTVAL, ?, ?, ?)</entry>
+	
+	<entry key="insertTodo">INSERT INTO TB_TODO VALUES(?, SEQ_TODO_NO.NEXTVAL, DEFAULT, DEFAULT) </entry>
+	
+	<entry key="deleteTodo">DELETE FROM TB_TODO WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
+	
+	<entry key="updateTodo">UPDATE TB_TODO SET TODO_TITLE = ? WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
+
+</properties>

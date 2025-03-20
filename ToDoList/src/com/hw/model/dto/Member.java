@@ -1,5 +1,4 @@
 package com.hw.model.dto;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
 public class Member {
 	
@@ -17,4 +15,10 @@ public class Member {
 	private String memberId;
 	private String memberPw;
 	private String nickname;
+	
+	public Member(String memberId, String memberPw, String nickname) {
+		this.memberId = memberId;
+		this.memberPw = memberPw;
+		this.nickname = nickname;
+	}
 }
