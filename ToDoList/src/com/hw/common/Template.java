@@ -3,11 +3,11 @@ package com.hw.common;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.Properties;
 
+//코드의 중복 작성과 메모리 효율을 위해 싱글톤 패턴을 활용한 Template을 생성
 public class Template {
-	
-	// 코드의 중복 작성과 메모리 효율을 위해 싱글톤 패턴을 활용한 Template을 생성
 
 	// JDBC 활용을 위한 Connection
 	public static Connection conn = null;
@@ -59,6 +59,26 @@ public class Template {
 		
 		try {
 			if(conn != null && !conn.isClosed()) conn.rollback();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void close(Connection conn) {
+		
+		try {
+			if(conn != null && !conn.isClosed()) conn.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void close(Statement stmt) {
+		
+		try {
+			if(stmt != null && !stmt.isClosed()) stmt.close();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
