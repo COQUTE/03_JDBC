@@ -33,6 +33,7 @@ public class ToDoView {
 			try {
 				showMenu();
 				menuNum = sc.nextInt();
+				sc.nextLine(); // 버퍼 비워주기
 				
 				System.out.println(); // 공백 추가
 				
@@ -42,10 +43,11 @@ public class ToDoView {
 				case 2: login(); break;
 				case 3: selectAll(); break;
 				case 4: insertTodo(); break;
-				case 5: updateTodo(); break;
-				case 6: changeComplete(); break;
-				case 7: deleteTodo(); break;
-				case 8: logout(); break;
+				case 5: insertTodo2(); break;
+				case 6: updateTodo(); break;
+				case 7: updateHasDone(); break;
+				case 8: deleteTodo(); break;
+				case 9: logout(); break;
 				case 0: System.out.println("시스템 종료..."); break;
 				default: System.out.println("메뉴 내에서 선택해주세요.");
 				}
@@ -71,10 +73,12 @@ public class ToDoView {
 		System.out.println("2. 로그인");
 		System.out.println("3. 내 Todo 전체 조회");
 		System.out.println("4. Todo 추가");
-		System.out.println("5. Todo 수정");
-		System.out.println("6. 완료 여부 변경");
-		System.out.println("7. Todo 삭제");
-		System.out.println("8. 로그아웃");
+		System.out.println("5. 커스텀 Todo 추가");
+		System.out.println("6. Todo 수정");
+		System.out.println("7. 완료 여부 변경");
+		System.out.println("8. Todo 삭제");
+		System.out.println("9. 로그아웃");
+		System.out.println("0. 종료");
 		System.out.println("--------------------------");
 		
 		if(isLogin())
@@ -209,6 +213,7 @@ public class ToDoView {
 	 */
 	private void selectAll() throws Exception {
 		
+		System.out.println("------------------------------------------------------------------------");
 		System.out.println("[내 Todo 전체 조회]");
 		
 		if(!isLogin()) {
@@ -226,6 +231,7 @@ public class ToDoView {
 		for(Todo todo : TodoList) {
 			System.out.println(todo);
 		}
+		System.out.println("------------------------------------------------------------------------");
 	}
 	
 	/**
@@ -233,7 +239,7 @@ public class ToDoView {
 	 * <h3>현재 로그인 된 회원코드를 가지고 Todo INSERT(+ COMMIT/ROLLBACK)</h3>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
-	 * 	<li>원하는 갯수 입력 받고 그 갯수만큼 Todo 만들기</li>
+	 * 	<li>현재 회원의 Todo - default 값으로 추가</li>
 	 * </ol>
 	 */
 	private void insertTodo() throws Exception {
@@ -245,22 +251,81 @@ public class ToDoView {
 			return;
 		}
 		
-		while(true) {
-			System.out.print("Todo 제목: ");
-			String todoTitle = sc.nextLine();
+		int result = service.insertTodo(loginMemCode, "제목");
 		
+		if(result > 0) {
+			System.out.println("Todo 추가 성공!");
+		} else {
+			System.out.println("Todo 추가 실패..");
+		}
+	}
+	
+	private String inputTodoTitle() {
+		
+		String todoTitle = null;
+		
+		while(true) {
+			System.out.print("제목 입력: ");
+			todoTitle = sc.nextLine();
+			
 			if(todoTitle.length() > 30) {
-				System.out.println("제목은 최대 30글자입니다.");
-				continue;
+				System.out.println("제목은 최대 30자입니다.");
+				
+			} else if(todoTitle.length() == 0) {
+				System.out.print("제목을 기본값으로 지정하시겠습니까?(Y/N): ");
+				String yn = sc.next().toUpperCase();
+				
+				if(yn.equals("Y")) {
+					todoTitle = "제목";
+					break;
+					
+				} else if(yn.equals("N")) {
+					System.out.println("제목을 다시 입력해주세요.");
+					sc.nextLine(); // 버퍼 비워주기
+					
+				} else {
+					throw new InputMismatchException();
+				}
+				
+			} else {
+				break;
 			}
-			
-			
+		}
+		
+		return todoTitle;
+	}
+	
+	/**
+	 * 5. Todo 커스텀 추가
+	 * <h3>현재 로그인 된 회원코드를 가지고 Todo INSERT(+ COMMIT/ROLLBACK)</h3>
+	 * <ol>
+	 * 	<li>현재 로그인 되어 있는지 확인</li>
+	 * 	<li>현재 회원의 Todo - 입력한 값으로 추가</li>
+	 * </ol>
+	 */
+	private void insertTodo2() throws Exception {
+
+		System.out.println("[Todo 커스텀 추가]");
+		
+		if(!isLogin()) {
+			System.out.println("로그인 후 다시 시도해주세요.");
+			return;
+		}
+		
+		String todoTitle = inputTodoTitle();
+		
+		int result = service.insertTodo(loginMemCode, todoTitle);
+		
+		if(result > 0) {
+			System.out.println("Todo 추가 성공!");
+		} else {
+			System.out.println("Todo 추가 실패..");
 		}
 		
 	}
 	
 	/**
-	 * 5. Todo 수정
+	 * 6. Todo 수정
 	 * <h3>현재 로그인 된 회원코드를 가지고 Todo UPDATE(+ COMMIT/ROLLBACK)</h3>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
@@ -276,17 +341,42 @@ public class ToDoView {
 			return;
 		}
 		
+		selectAll();
+		
+		System.out.print("Todo 번호 입력: ");
+		int todoNo = sc.nextInt();
+		sc.nextLine(); // 버퍼 비워주기
+		
+		// 해당 유저에 해당 todoNo이 있는지 확인
+		int count = service.todoNoCheck(todoNo);
+		
+		if(count == 0) {
+			System.out.println("해당 Todo가 없습니다. 다시 시도해주세요.");
+			return;
+		}
+		
+		String todoTitle = inputTodoTitle();
+		
+		Todo todo = new Todo(loginMemCode, todoNo, todoTitle);
+		
+		int result = service.updateTodo(todo);
+		
+		if(result > 0) {
+			System.out.println("Todo 수정 성공!");
+		} else {
+			System.out.println("Todo 수정 실패..");
+		}
 	}
 	
 	/**
-	 * 6. 완료여부 변경
+	 * 7. 완료여부 변경
 	 * <h3>현재 로그인 된 회원코드를 가지고 HAS_DONE UPDATE(+ COMMIT/ROLLBACK)</h3>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>TODO_NO를 입력하면 해당 Todo의 완료 여부를 변경</li>
 	 * </ol>
 	 */
-	private void changeComplete() throws Exception {
+	private void updateHasDone() throws Exception {
 
 		System.out.println("[완료여부 변경]");
 		
@@ -295,10 +385,41 @@ public class ToDoView {
 			return;
 		}
 		
+		selectAll();
+		
+		System.out.print("Todo 번호 입력: ");
+		int todoNo = sc.nextInt();
+		sc.nextLine(); // 버퍼 제거
+		
+		// 해당 유저에 해당 todoNo이 있는지 확인
+		int count = service.todoNoCheck(todoNo);
+		
+		if(count == 0) {
+			System.out.println("해당 Todo가 없습니다. 다시 시도해주세요.");
+			return;
+		}
+		
+		System.out.print("완료여부 입력: ");
+		char hasDone = sc.next().toUpperCase().charAt(0);
+		
+		if(hasDone != 'Y' && hasDone != 'N') {
+			System.out.println("잘못된 입력입니다. 다시 시도해주세요.");
+			return;
+		}
+		
+		Todo todo = new Todo(loginMemCode, todoNo, hasDone);
+		
+		int result = service.updateHasDone(todo);
+		
+		if(result > 0) {
+			System.out.println("완료여부 변경 완료!");
+		} else {
+			System.out.println("완료여부 변경 실패..");
+		}
 	}
 	
 	/**
-	 * 7. Todo 삭제
+	 * 8. Todo 삭제
 	 * <h3>현재 로그인 된 회원코드를 가지고 Todo DELETE(+ COMMIT/ROLLBACK)</h3>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
@@ -313,10 +434,32 @@ public class ToDoView {
 			System.out.println("로그인 후 다시 시도해주세요.");
 			return;
 		}
+
+		selectAll();
+		
+		System.out.print("Todo 번호 입력: ");
+		int todoNo = sc.nextInt();
+		sc.nextLine(); // 버퍼 비워주기
+		
+		// 해당 유저에 해당 todoNo이 있는지 확인
+		int count = service.todoNoCheck(todoNo);
+		
+		if(count == 0) {
+			System.out.println("해당 Todo가 없습니다. 다시 시도해주세요.");
+			return;
+		}
+		
+		int result = service.deleteTodo(loginMemCode, todoNo);
+		
+		if(result > 0) {
+			System.out.println("Todo 삭제 성공!");
+		} else {
+			System.out.println("Todo 삭제 실패..");
+		}
 	}
 	
 	/**
-	 * 8. 로그아웃
+	 * 9. 로그아웃
 	 * <h3></h3>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>

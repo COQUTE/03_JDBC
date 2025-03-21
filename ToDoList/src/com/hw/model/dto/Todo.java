@@ -10,17 +10,29 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Todo {
 
+	private int memCode;
 	private int todoNo;
 	private String todoTitle;
 	private char hasDone;
 	private String createdDate;
 	
-	public Todo(String todoTitle, char hasDone, String createdDate) {
+	public Todo(int memCode, int todoNo, String todoTitle) {
+		this.memCode = memCode;
+		this.todoNo = todoNo;
 		this.todoTitle = todoTitle;
+	}
+	
+	public Todo(int memCode, int todoNo, char hasDone) {
+		this.memCode = memCode;
+		this.todoNo = todoNo;
 		this.hasDone = hasDone;
-		this.createdDate = createdDate;
+	}
+
+	@Override
+	public String toString() {
+		return "Todo [todoNo=" + todoNo + ", todoTitle=" + todoTitle + ", hasDone=" + hasDone + ", createdDate="
+				+ createdDate + "]";
 	}
 }

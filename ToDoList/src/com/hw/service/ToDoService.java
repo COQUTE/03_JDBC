@@ -73,5 +73,82 @@ public class ToDoService {
 		return TodoList;
 	}
 
+	public int insertTodo(int loginMemCode, String todoTitle) throws Exception {
+
+		Connection conn = getConnection();
+		
+		int result = dao.insertTodo(conn, loginMemCode, todoTitle);
+		
+		if(result > 0) {
+			commit(conn);
+		} else {
+			rollback(conn);
+		}
+		
+		close(conn);
+		
+		return result;
+	}
+	
+	public int todoNoCheck(int todoNo) throws Exception {
+
+		Connection conn = getConnection();
+		
+		int count = dao.todoNoCheck(conn, todoNo);
+		
+		close(conn);
+		
+		return count;
+	}
+
+	public int updateTodo(Todo todo) throws Exception {
+
+		Connection conn = getConnection();
+		
+		int result = dao.updateTodo(conn, todo);
+		
+		if(result > 0) {
+			commit(conn);
+		} else {
+			rollback(conn);
+		}
+		
+		close(conn);
+		
+		return result;
+	}
+
+	public int updateHasDone(Todo todo) throws Exception {
+
+		Connection conn = getConnection();
+		
+		int result = dao.updateHasDone(conn, todo);
+		
+		if(result > 0) {
+			commit(conn);
+		} else {
+			rollback(conn);
+		}
+		
+		return result;
+	}
+
+	public int deleteTodo(int loginMemCode, int todoNo) throws Exception{
+		
+		Connection conn = getConnection();
+		
+		int result = dao.deleteTodo(conn, loginMemCode, todoNo);
+		
+		if(result > 0) {
+			commit(conn);
+		} else {
+			rollback(conn);
+		}
+		
+		return result;
+	}
+
+
+
 	
 }
