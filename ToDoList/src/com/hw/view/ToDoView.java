@@ -43,9 +43,9 @@ public class ToDoView {
 				case 2: login(); break;
 				case 3: selectAll(); break;
 				case 4: insertTodo(); break;
-				case 5: insertTodo2(); break;
+				case 5: insertCustomTodo(); break;
 				case 6: updateTodo(); break;
-				case 7: updateHasDone(); break;
+				case 7: updateCompleteYN(); break;
 				case 8: deleteTodo(); break;
 				case 9: logout(); break;
 				case 0: System.out.println("시스템 종료..."); break;
@@ -72,7 +72,7 @@ public class ToDoView {
 		System.out.println("1. 회원가입");
 		System.out.println("2. 로그인");
 		System.out.println("3. 내 Todo 전체 조회");
-		System.out.println("4. Todo 추가");
+		System.out.println("4. 기본 Todo 추가");
 		System.out.println("5. 커스텀 Todo 추가");
 		System.out.println("6. Todo 수정");
 		System.out.println("7. 완료 여부 변경");
@@ -100,6 +100,36 @@ public class ToDoView {
 			return false;
 	}
 	
+	private boolean validLength(String type, String str) {
+		
+		final int PW_MIN_LENGTH = 4;
+		final int MAX_LENGTH = 20;
+		final int NICK_MAX_LENGTH = 10;
+		
+		if(str.length() > MAX_LENGTH) {
+			System.out.println(type.toUpperCase() + "은/는 최대 20자입니다.");
+			return false;
+		}
+		
+		switch(type.toUpperCase()) {
+		
+		case "PW":
+			if(str.length() < PW_MIN_LENGTH) {
+				System.out.println(type.toUpperCase() + "는 최소 " + PW_MIN_LENGTH + "자 이상 작성해주세요");
+				return false;
+			}
+		break;
+		
+		case "NICK":
+			if(str.length() > NICK_MAX_LENGTH) {
+				System.out.println(type.toUpperCase() + "은 최대 " + NICK_MAX_LENGTH +"자입니다.");
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * 1. 회원가입
 	 * <h3>새로운 Member 정보를 입력받고 Member INSERT(+ COMMIT/ROLLBACK)</h3>
@@ -120,21 +150,13 @@ public class ToDoView {
 		}
 		
 		String memId = null;
-		
-		while(true) {
-		
+		do {
 			// 아이디 입력
-			System.out.print("아이디: ");
+			System.out.print("ID: ");
 			memId = sc.next();
 			
-			if(memId.length() <= 5) { // NOT NULL로 설정해놨기 때문, 최소 길이 지정
-				System.out.println("다섯 글자 이상 입력하세요.");
+			if(!validLength("id", memId))
 				continue;
-				
-			} else if(memId.length() > 10) { // NVARCHAR2(10)으로 설정해놨기 때문
-				System.out.println("아이디는 최대 10글자입니다.");
-				continue;
-			}
 			
 			// service 호출해서 입력한 아이디 중복 확인
 			// 중복은 1, 중복이 아니면 0
@@ -143,15 +165,32 @@ public class ToDoView {
 			if(count == 0)
 				break;
 			
-			System.out.println("이미 존재하는 아이디입니다.");
-		}
+			System.out.println("이미 존재하는 ID입니다.");
+			
+		} while(true);
 		
 		// 중복이 안 될 경우, 비밀번호, 닉네임 입력
-		System.out.print("비밀번호: ");
-		String memPw = sc.next();
+
+		String memPw = null;
+		do {
+			System.out.print("PW: ");
+			memPw = sc.next();
+			
+			if(validLength("pw", memPw))
+				break;
+			
+		} while(true);
 		
-		System.out.print("닉네임: ");
-		String nickname = sc.next();
+		String nickname = null;
+		do {
+			System.out.print("NICKNAME: ");
+			nickname = sc.next();
+			
+			if(validLength("nickname", nickname))
+				break;
+			
+		} while(true);
+		
 		
 		// Member 객체로 압축
 		Member mem = new Member(memId, memPw, nickname);
@@ -185,10 +224,10 @@ public class ToDoView {
 			return;
 		}
 		
-		System.out.print("아이디: ");
+		System.out.print("ID: ");
 		String memId = sc.next();
 		
-		System.out.print("비밀번호: ");
+		System.out.print("PW: ");
 		String memPw = sc.next();
 		
 		loginMemCode = service.getMemCode(memId, memPw);
@@ -213,7 +252,7 @@ public class ToDoView {
 	 */
 	private void selectAll() throws Exception {
 		
-		System.out.println("------------------------------------------------------------------------");
+		System.out.println("-------------------");
 		System.out.println("[내 Todo 전체 조회]");
 		
 		if(!isLogin()) {
@@ -228,14 +267,17 @@ public class ToDoView {
 			return;
 		}
 		
+		System.out.println("-------------------");
+		
 		for(Todo todo : TodoList) {
 			System.out.println(todo);
 		}
-		System.out.println("------------------------------------------------------------------------");
+	
+		System.out.println("-------------------");
 	}
 	
 	/**
-	 * 4. Todo 추가
+	 * 4. 기본 Todo 추가
 	 * <h3>현재 로그인 된 회원코드를 가지고 Todo INSERT(+ COMMIT/ROLLBACK)</h3>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
@@ -244,55 +286,25 @@ public class ToDoView {
 	 */
 	private void insertTodo() throws Exception {
 
-		System.out.println("[Todo 추가]");
+		System.out.println("[기본 Todo 추가]");
 		
 		if(!isLogin()) {
 			System.out.println("로그인 후 다시 시도해주세요.");
 			return;
 		}
 		
-		int result = service.insertTodo(loginMemCode, "제목");
+		String todoTitle = "제목";
+		String todoContent = "내용";
+		
+		Todo todo = new Todo(loginMemCode, todoTitle, todoContent);
+		
+		int result = service.insertTodo(todo);
 		
 		if(result > 0) {
-			System.out.println("Todo 추가 성공!");
+			System.out.println("기본 Todo 추가 성공!");
 		} else {
-			System.out.println("Todo 추가 실패..");
+			System.out.println("기본 Todo 추가 실패..");
 		}
-	}
-	
-	private String inputTodoTitle() {
-		
-		String todoTitle = null;
-		
-		while(true) {
-			System.out.print("제목 입력: ");
-			todoTitle = sc.nextLine();
-			
-			if(todoTitle.length() > 30) {
-				System.out.println("제목은 최대 30자입니다.");
-				
-			} else if(todoTitle.length() == 0) {
-				System.out.print("제목을 기본값으로 지정하시겠습니까?(Y/N): ");
-				String yn = sc.next().toUpperCase();
-				
-				if(yn.equals("Y")) {
-					todoTitle = "제목";
-					break;
-					
-				} else if(yn.equals("N")) {
-					System.out.println("제목을 다시 입력해주세요.");
-					sc.nextLine(); // 버퍼 비워주기
-					
-				} else {
-					throw new InputMismatchException();
-				}
-				
-			} else {
-				break;
-			}
-		}
-		
-		return todoTitle;
 	}
 	
 	/**
@@ -303,7 +315,7 @@ public class ToDoView {
 	 * 	<li>현재 회원의 Todo - 입력한 값으로 추가</li>
 	 * </ol>
 	 */
-	private void insertTodo2() throws Exception {
+	private void insertCustomTodo() throws Exception {
 
 		System.out.println("[Todo 커스텀 추가]");
 		
@@ -312,14 +324,28 @@ public class ToDoView {
 			return;
 		}
 		
-		String todoTitle = inputTodoTitle();
+		String todoTitle = null;
+		do {
+			System.out.print("제목 입력: ");
+			todoTitle = sc.next();
+			sc.nextLine(); // 버퍼 제거
+			
+			if(validLength("title", todoTitle))
+				break;
+			
+		} while(true);
 		
-		int result = service.insertTodo(loginMemCode, todoTitle);
+		System.out.print("내용 입력: ");
+		String todoContent = sc.nextLine();
+		
+		Todo todo = new Todo(loginMemCode, todoTitle, todoContent);
+		
+		int result = service.insertTodo(todo);
 		
 		if(result > 0) {
-			System.out.println("Todo 추가 성공!");
+			System.out.println("커스텀 Todo 추가 성공!");
 		} else {
-			System.out.println("Todo 추가 실패..");
+			System.out.println("커스텀 Todo 추가 실패..");
 		}
 		
 	}
@@ -355,9 +381,21 @@ public class ToDoView {
 			return;
 		}
 		
-		String todoTitle = inputTodoTitle();
+		String todoTitle = null;
+		do {
+			System.out.print("제목 입력: ");
+			todoTitle = sc.next();
+			sc.nextLine(); // 버퍼 제거
+			
+			if(validLength("title", todoTitle))
+				break;
+			
+		} while(true);
 		
-		Todo todo = new Todo(loginMemCode, todoNo, todoTitle);
+		System.out.print("내용 입력: ");
+		String todoContent = sc.nextLine();
+		
+		Todo todo = new Todo(loginMemCode, todoNo, todoTitle, todoContent);
 		
 		int result = service.updateTodo(todo);
 		
@@ -376,7 +414,7 @@ public class ToDoView {
 	 * 	<li>TODO_NO를 입력하면 해당 Todo의 완료 여부를 변경</li>
 	 * </ol>
 	 */
-	private void updateHasDone() throws Exception {
+	private void updateCompleteYN() throws Exception {
 
 		System.out.println("[완료여부 변경]");
 		
@@ -400,16 +438,16 @@ public class ToDoView {
 		}
 		
 		System.out.print("완료여부 입력: ");
-		char hasDone = sc.next().toUpperCase().charAt(0);
+		char completeYN = sc.next().toUpperCase().charAt(0);
 		
-		if(hasDone != 'Y' && hasDone != 'N') {
+		if(completeYN != 'Y' && completeYN != 'N') {
 			System.out.println("잘못된 입력입니다. 다시 시도해주세요.");
 			return;
 		}
 		
-		Todo todo = new Todo(loginMemCode, todoNo, hasDone);
+		Todo todo = new Todo(loginMemCode, todoNo, completeYN);
 		
-		int result = service.updateHasDone(todo);
+		int result = service.updateCompleteYN(todo);
 		
 		if(result > 0) {
 			System.out.println("완료여부 변경 완료!");

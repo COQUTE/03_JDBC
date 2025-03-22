@@ -73,11 +73,11 @@ public class ToDoService {
 		return TodoList;
 	}
 
-	public int insertTodo(int loginMemCode, String todoTitle) throws Exception {
+	public int insertTodo(Todo todo) throws Exception {
 
 		Connection conn = getConnection();
 		
-		int result = dao.insertTodo(conn, loginMemCode, todoTitle);
+		int result = dao.insertTodo(conn, todo);
 		
 		if(result > 0) {
 			commit(conn);
@@ -118,11 +118,11 @@ public class ToDoService {
 		return result;
 	}
 
-	public int updateHasDone(Todo todo) throws Exception {
+	public int updateCompleteYN(Todo todo) throws Exception {
 
 		Connection conn = getConnection();
 		
-		int result = dao.updateHasDone(conn, todo);
+		int result = dao.updateCompleteYN(conn, todo);
 		
 		if(result > 0) {
 			commit(conn);

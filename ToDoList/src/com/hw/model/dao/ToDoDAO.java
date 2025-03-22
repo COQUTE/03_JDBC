@@ -30,7 +30,6 @@ public class ToDoDAO {
 			String query = prop.getProperty("CountMember");
 			
 			pstmt = conn.prepareStatement(query);
-			
 			pstmt.setString(1, memId);
 			
 			rs = pstmt.executeQuery();
@@ -39,8 +38,8 @@ public class ToDoDAO {
 				count = rs.getInt(1);
 				
 		} finally {
-			close(pstmt);
 			close(rs);
+			close(pstmt);
 		}
 			
 		
@@ -55,7 +54,6 @@ public class ToDoDAO {
 			String query = prop.getProperty("insertMember");
 			
 			pstmt = conn.prepareStatement(query);
-			
 			pstmt.setString(1, mem.getMemberId());
 			pstmt.setString(2, mem.getMemberPw());
 			pstmt.setString(3, mem.getNickname());
@@ -77,7 +75,6 @@ public class ToDoDAO {
 			String query = prop.getProperty("selectMember");
 			
 			pstmt = conn.prepareStatement(query);
-			
 			pstmt.setString(1, memId);
 			pstmt.setString(2, memPw);
 			
@@ -103,7 +100,6 @@ public class ToDoDAO {
 			String query = prop.getProperty("selectNickname");
 			
 			pstmt = conn.prepareStatement(query);
-			
 			pstmt.setInt(1, loginMemCode);
 			
 			rs = pstmt.executeQuery();
@@ -128,7 +124,6 @@ public class ToDoDAO {
 			String query = prop.getProperty("selectTodo");
 			
 			pstmt = conn.prepareStatement(query);
-			
 			pstmt.setInt(1, loginMemCode);
 			
 			rs = pstmt.executeQuery();
@@ -139,7 +134,9 @@ public class ToDoDAO {
 			
 			while(rs.next()) {
 				
-				TodoList.add(new Todo(rs.getInt("MEMBER_CODE"), rs.getInt("TODO_NO"), rs.getString("TODO_TITLE"), rs.getString("HAS_DONE").charAt(0), rs.getString("CREATED_DATE")));
+				TodoList.add(new Todo(rs.getInt("MEMBER_CODE"), rs.getInt("TODO_NO"),
+						rs.getString("TODO_TITLE"), rs.getString("TODO_CONTENT"), rs.getString("COMPLETE_YN").charAt(0),
+						rs.getString("CREATED_DATE"), rs.getString("UPDATED_DATE")));
 			}
 			
 		} finally {
@@ -150,7 +147,7 @@ public class ToDoDAO {
 		return TodoList;
 	}
 
-	public int insertTodo(Connection conn, int loginMemCode, String todoTitle) throws Exception {
+	public int insertTodo(Connection conn, Todo todo) throws Exception {
 
 		int result = 0;
 		
@@ -158,9 +155,9 @@ public class ToDoDAO {
 			String query = prop.getProperty("insertTodo");
 			
 			pstmt = conn.prepareStatement(query);
-			
-			pstmt.setInt(1, loginMemCode);
-			pstmt.setString(2, todoTitle);
+			pstmt.setInt(1, todo.getMemCode());
+			pstmt.setString(2, todo.getTodoTitle());
+			pstmt.setString(3, todo.getTodoContent());
 			
 			result = pstmt.executeUpdate();
 			
@@ -179,7 +176,6 @@ public class ToDoDAO {
 			String query = prop.getProperty("CountTodo");
 			
 			pstmt = conn.prepareStatement(query);
-			
 			pstmt.setInt(1, todoNo);
 			
 			rs = pstmt.executeQuery();
@@ -204,10 +200,10 @@ public class ToDoDAO {
 			String query = prop.getProperty("updateTodo");
 			
 			pstmt = conn.prepareStatement(query);
-			
 			pstmt.setString(1, todo.getTodoTitle());
-			pstmt.setInt(2, todo.getMemCode());
-			pstmt.setInt(3, todo.getTodoNo());
+			pstmt.setString(2, todo.getTodoContent());
+			pstmt.setInt(3, todo.getMemCode());
+			pstmt.setInt(4, todo.getTodoNo());
 			
 			result = pstmt.executeUpdate();
 			
@@ -218,16 +214,15 @@ public class ToDoDAO {
 		return result;
 	}
 
-	public int updateHasDone(Connection conn, Todo todo) throws Exception {
+	public int updateCompleteYN(Connection conn, Todo todo) throws Exception {
 
 		int result = 0;
 		
 		try {
-			String query = prop.getProperty("updateHasDone");
+			String query = prop.getProperty("updateCompleteYN");
 			
 			pstmt = conn.prepareStatement(query);
-			
-			pstmt.setString(1, String.valueOf(todo.getHasDone()));
+			pstmt.setString(1, String.valueOf(todo.getCompleteYN()));
 			pstmt.setInt(2, todo.getMemCode());
 			pstmt.setInt(3, todo.getTodoNo());
 			
@@ -248,7 +243,6 @@ public class ToDoDAO {
 			String query = prop.getProperty("deleteTodo");
 			
 			pstmt = conn.prepareStatement(query);
-			
 			pstmt.setInt(1, loginMemCode);
 			pstmt.setInt(2, todoNo);
 			

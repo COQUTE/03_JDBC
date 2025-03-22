@@ -8,18 +8,18 @@
 
 	<entry key="selectNickname">SELECT NICKNAME FROM TB_MEMBER WHERE MEMBER_CODE = ?</entry>
 	
-	<entry key="selectTodo">SELECT MEMBER_CODE, TODO_NO, TODO_TITLE, HAS_DONE, TO_CHAR(CREATED_DATE, 'YYYY"년" MM"월" DD"일"') AS CREATED_DATE FROM TB_TODO WHERE MEMBER_CODE = ?</entry>
+	<entry key="selectTodo">SELECT MEMBER_CODE, TODO_NO, TODO_TITLE, TODO_CONTENT, COMPLETE_YN, TO_CHAR(CREATED_DATE, 'YYYY"년" MM"월" DD"일" HH12:MI:SS') AS CREATED_DATE, TO_CHAR(UPDATED_DATE, 'YYYY"년" MM"월" DD"일" HH12:MI:SS') AS UPDATED_DATE FROM TB_TODO WHERE MEMBER_CODE = ?</entry>
 	
 	<entry key="CountTodo">SELECT COUNT(*) FROM TB_TODO WHERE TODO_NO = ?</entry>	
 	
 	<entry key="insertMember">INSERT INTO TB_MEMBER VALUES(SEQ_MEMBER_CODE.NEXTVAL, ?, ?, ?)</entry>
 	
-	<entry key="insertTodo">INSERT INTO TB_TODO VALUES(?, SEQ_TODO_NO.NEXTVAL, ?, DEFAULT, DEFAULT) </entry>
+	<entry key="insertTodo">INSERT INTO TB_TODO VALUES(?, SEQ_TODO_NO.NEXTVAL, ?, ?, DEFAULT, DEFAULT, DEFAULT) </entry>
 	
 	<entry key="deleteTodo">DELETE FROM TB_TODO WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
 	
-	<entry key="updateTodo">UPDATE TB_TODO SET TODO_TITLE = ? WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
+	<entry key="updateTodo">UPDATE TB_TODO SET TODO_TITLE = ?, TODO_CONTENT = ?, UPDATED_DATE = DEFAULT WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
 
-	<entry key="updateHasDone">UPDATE TB_TODO SET HAS_DONE = ? WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
+	<entry key="updateCompleteYN">UPDATE TB_TODO SET COMPLETE_YN = ? WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
 
 </properties>
