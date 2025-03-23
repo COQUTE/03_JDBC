@@ -1,5 +1,6 @@
 package com.hw.view;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -25,6 +26,13 @@ public class ToDoView {
 		loginMemCode = 0;
 	}
 	
+	/** <h3>Display TodoList</h3>
+	 * <ol>
+	 * <li>메뉴 출력</li>
+	 * <li>메뉴 선택</li>
+	 * <li>선택된 메서드 호출</li>
+	 * </ol>
+	 */
 	public void display() {
 	
 		int menuNum = 0;
@@ -32,25 +40,11 @@ public class ToDoView {
 		do {
 			try {
 				showMenu();
+				
 				menuNum = sc.nextInt();
 				sc.nextLine(); // 버퍼 비워주기
 				
-				System.out.println(); // 공백 추가
-				
-				switch(menuNum) {
-				
-				case 1: createMember(); break;
-				case 2: login(); break;
-				case 3: selectAll(); break;
-				case 4: insertTodo(); break;
-				case 5: insertCustomTodo(); break;
-				case 6: updateTodo(); break;
-				case 7: updateCompleteYN(); break;
-				case 8: deleteTodo(); break;
-				case 9: logout(); break;
-				case 0: System.out.println("시스템 종료..."); break;
-				default: System.out.println("메뉴 내에서 선택해주세요.");
-				}
+				selectMenu(menuNum);
 				
 			} catch (InputMismatchException e) {
 				System.out.println("잘못된 입력입니다.");
@@ -64,33 +58,78 @@ public class ToDoView {
 		} while(menuNum != 0);
 		
 	}
-
+	
+	/**
+	 * <h3>로그인 여부에 따라 메뉴 출력</h3>
+	 */
 	private void showMenu() {
 		
-		System.out.println();
-		System.out.println("---------ToDoList---------");
-		System.out.println("1. 회원가입");
-		System.out.println("2. 로그인");
-		System.out.println("3. 내 Todo 전체 조회");
-		System.out.println("4. 기본 Todo 추가");
-		System.out.println("5. 커스텀 Todo 추가");
-		System.out.println("6. Todo 수정");
-		System.out.println("7. 완료 여부 변경");
-		System.out.println("8. Todo 삭제");
-		System.out.println("9. 로그아웃");
-		System.out.println("0. 종료");
-		System.out.println("--------------------------");
+		List<String> menuList = new ArrayList<String>();
 		
-		if(isLogin())
+		if(!isLogin()) {
+			menuList.add("회원가입");
+			menuList.add("로그인");
+			
+		} else {
+			menuList.add("내 Todo 전체 조회");
+			menuList.add("기본 Todo 추가");
+			menuList.add("커스텀 Todo 추가");
+			menuList.add("Todo 수정");
+			menuList.add("완료 여부 변경");
+			menuList.add("Todo 삭제");
+			menuList.add("로그아웃");
+		}
+		
+		System.out.println("\n---------TodoList---------");
+		
+		int num = 1;
+		for(String menu : menuList) {
+			System.out.println(num++ + ". " + menu);
+		}
+		System.out.print("0. 종료");
+		
+		System.out.println("\n--------------------------");
+		
+		if(isLogin()) {
 			System.out.println("<현재 사용자: " + curNickname + ">");
-		
+		}
 		System.out.print("메뉴 번호 입력: ");
 	}
 	
+	/** <h3>로그인 여부에 따라 메뉴 출력</h3>
+	 * @param menuNum : 입력된 메뉴 번호
+	 * @throws Exception
+	 */
+	private void selectMenu(int menuNum) throws Exception {
+		
+		System.out.println();
+		
+		if(!isLogin()) {
+			switch(menuNum) {
+			case 1: createMember(); break;
+			case 2: login();		break;
+			case 0: System.out.println("시스템 종료..."); break;
+			default: System.out.println("메뉴 내에서 선택해주세요.");
+			}
+			
+		} else {
+			switch(menuNum) {
+			case 1: selectAll();		break;
+			case 2: insertTodo();		break;
+			case 3: insertCustomTodo(); break;
+			case 4: updateTodo();		break;
+			case 5: updateCompleteYN(); break;
+			case 6: deleteTodo();		break;
+			case 7: logout();			break;
+			case 0: System.out.println("시스템 종료..."); break;
+			default: System.out.println("메뉴 내에서 선택해주세요.");
+			}
+		}
+	}
+	
 	/**
-	 * 로그인 여부를 확인
-	 * 
-	 * @return 로그인 여부
+	 * <h3>로그인 여부를 확인</h3>
+	 * @return 로그인 여부(true/false)
 	 */
 	private boolean isLogin() {
 		
@@ -100,6 +139,11 @@ public class ToDoView {
 			return false;
 	}
 	
+	/** 
+	 * @param type : 범위가 지정되어 있는 컬럼(ID/PW/NICKNAME)
+	 * @param str : 입력된 문자열
+	 * @return DB 컬럼별 범위 포함 여부(true/false)
+	 */
 	private boolean validLength(String type, String str) {
 		
 		final int PW_MIN_LENGTH = 4;
@@ -120,7 +164,7 @@ public class ToDoView {
 			}
 		break;
 		
-		case "NICK":
+		case "NICKNAME":
 			if(str.length() > NICK_MAX_LENGTH) {
 				System.out.println(type.toUpperCase() + "은 최대 " + NICK_MAX_LENGTH +"자입니다.");
 				return false;
@@ -130,9 +174,8 @@ public class ToDoView {
 		return true;
 	}
 	
-	/**
-	 * 1. 회원가입
-	 * <h3>새로운 Member 정보를 입력받고 Member INSERT(+ COMMIT/ROLLBACK)</h3>
+	/** <h3>회원가입</h3>
+	 * <b>새로운 Member 정보를 입력받고 Member INSERT(+ COMMIT/ROLLBACK)</b>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>아이디 생략, 중복 확인</li>
@@ -191,7 +234,6 @@ public class ToDoView {
 			
 		} while(true);
 		
-		
 		// Member 객체로 압축
 		Member mem = new Member(memId, memPw, nickname);
 		
@@ -206,9 +248,8 @@ public class ToDoView {
 		
 	}
 	
-	/**
-	 * 2. 로그인
-	 * <h3>아이디, 비밀번호 입력받고 기존 Member SELECT</h3>
+	/** <h3>로그인</h3>
+	 * <b>아이디, 비밀번호 입력받고 기존 Member SELECT</b>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>로그인 성공시 닉네임 출력</li>
@@ -242,9 +283,8 @@ public class ToDoView {
 		
 	}
 	
-	/**
-	 * 3. 내 Todo 전체 조회
-	 * <h3>현재 로그인 된 회원코드를 가지고 Todo 전체 SELECT</h3>
+	/** <h3>내 Todo 전체 조회</h3>
+	 * <b>현재 로그인 된 회원코드를 가지고 Todo 전체 SELECT</b>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>현재 Member의 모든 Todo 출력</li>
@@ -276,9 +316,8 @@ public class ToDoView {
 		System.out.println("-------------------");
 	}
 	
-	/**
-	 * 4. 기본 Todo 추가
-	 * <h3>현재 로그인 된 회원코드를 가지고 Todo INSERT(+ COMMIT/ROLLBACK)</h3>
+	/** <h3>기본 Todo 추가</h3>
+	 * <b>현재 로그인 된 회원코드를 가지고 Todo INSERT(+ COMMIT/ROLLBACK)</b>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>현재 회원의 Todo - default 값으로 추가</li>
@@ -307,9 +346,8 @@ public class ToDoView {
 		}
 	}
 	
-	/**
-	 * 5. Todo 커스텀 추가
-	 * <h3>현재 로그인 된 회원코드를 가지고 Todo INSERT(+ COMMIT/ROLLBACK)</h3>
+	/** <h3>Todo 커스텀 추가</h3>
+	 * <b>현재 로그인 된 회원코드를 가지고 Todo INSERT(+ COMMIT/ROLLBACK)</b>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>현재 회원의 Todo - 입력한 값으로 추가</li>
@@ -350,9 +388,8 @@ public class ToDoView {
 		
 	}
 	
-	/**
-	 * 6. Todo 수정
-	 * <h3>현재 로그인 된 회원코드를 가지고 Todo UPDATE(+ COMMIT/ROLLBACK)</h3>
+	/** <h3>Todo 수정</h3>
+	 * <b>현재 로그인 된 회원코드를 가지고 Todo UPDATE(+ COMMIT/ROLLBACK)</b>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>원하는 만큼 계속 제목, 내용 수정 가능</li>
@@ -406,9 +443,8 @@ public class ToDoView {
 		}
 	}
 	
-	/**
-	 * 7. 완료여부 변경
-	 * <h3>현재 로그인 된 회원코드를 가지고 HAS_DONE UPDATE(+ COMMIT/ROLLBACK)</h3>
+	/** <h3>완료여부 변경</h3>
+	 * <b>현재 로그인 된 회원코드를 가지고 HAS_DONE UPDATE(+ COMMIT/ROLLBACK)</b>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>TODO_NO를 입력하면 해당 Todo의 완료 여부를 변경</li>
@@ -456,9 +492,8 @@ public class ToDoView {
 		}
 	}
 	
-	/**
-	 * 8. Todo 삭제
-	 * <h3>현재 로그인 된 회원코드를 가지고 Todo DELETE(+ COMMIT/ROLLBACK)</h3>
+	/** <h3>Todo 삭제</h3>
+	 * <b>현재 로그인 된 회원코드를 가지고 Todo DELETE(+ COMMIT/ROLLBACK)</b>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>TODO_NO를 입력하면 해당 Todo 삭제</li>
@@ -496,9 +531,7 @@ public class ToDoView {
 		}
 	}
 	
-	/**
-	 * 9. 로그아웃
-	 * <h3></h3>
+	/** <h3>로그아웃</h3>
 	 * <ol>
 	 * 	<li>현재 로그인 되어 있는지 확인</li>
 	 * 	<li>로그인 된 경우 로그아웃</li>
