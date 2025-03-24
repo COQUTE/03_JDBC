@@ -214,6 +214,30 @@ public class ToDoDAO {
 		return result;
 	}
 
+	public char selectCompleteYN(Connection conn, Todo todo) throws Exception {
+		
+		char completeYN = ' ';
+		
+		try {
+			String query = prop.getProperty("selectCompleteYN");
+			
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, todo.getMemCode());
+			pstmt.setInt(2, todo.getTodoNo());
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				completeYN = rs.getString(1).charAt(0);
+			}
+			
+		} finally {
+			close(pstmt);
+		}
+		
+		return completeYN;
+	}
+	
 	public int updateCompleteYN(Connection conn, Todo todo) throws Exception {
 
 		int result = 0;
@@ -222,7 +246,12 @@ public class ToDoDAO {
 			String query = prop.getProperty("updateCompleteYN");
 			
 			pstmt = conn.prepareStatement(query);
-			pstmt.setString(1, String.valueOf(todo.getCompleteYN()));
+			
+			if(todo.getCompleteYN() == 'N')
+				pstmt.setString(1, "Y");
+			else
+				pstmt.setString(1, "N");
+			
 			pstmt.setInt(2, todo.getMemCode());
 			pstmt.setInt(3, todo.getTodoNo());
 			

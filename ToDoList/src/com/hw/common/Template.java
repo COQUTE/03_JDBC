@@ -28,7 +28,7 @@ public class Template {
 			// xml 파일을 읽어와야 하기 때문에 InputStream 생성
 			// driver.xml에 InputStream 연결
 			// 연결된 InputStream을 통해 Properties 객체에 entry 내용들 읽어들임
-			prop.loadFromXML(new FileInputStream("src/com/hw/resource/driver.xml"));
+			prop.loadFromXML(new FileInputStream("src/com/hw/resources/driver.xml"));
 			
 			// driver 메모리에 로드
 			Class.forName(prop.getProperty("driver"));
@@ -53,7 +53,7 @@ public class Template {
 		
 		try {
 			prop = new Properties();
-			fis = new FileInputStream("src/com/hw/resource/query.xml");
+			fis = new FileInputStream("src/com/hw/resources/query.xml");
 			
 			prop.loadFromXML(fis);
 			

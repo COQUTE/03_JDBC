@@ -365,8 +365,7 @@ public class ToDoView {
 		String todoTitle = null;
 		do {
 			System.out.print("제목 입력: ");
-			todoTitle = sc.next();
-			sc.nextLine(); // 버퍼 제거
+			todoTitle = sc.nextLine();
 			
 			if(validLength("title", todoTitle))
 				break;
@@ -421,8 +420,7 @@ public class ToDoView {
 		String todoTitle = null;
 		do {
 			System.out.print("제목 입력: ");
-			todoTitle = sc.next();
-			sc.nextLine(); // 버퍼 제거
+			todoTitle = sc.nextLine();
 			
 			if(validLength("title", todoTitle))
 				break;
@@ -473,15 +471,7 @@ public class ToDoView {
 			return;
 		}
 		
-		System.out.print("완료여부 입력: ");
-		char completeYN = sc.next().toUpperCase().charAt(0);
-		
-		if(completeYN != 'Y' && completeYN != 'N') {
-			System.out.println("잘못된 입력입니다. 다시 시도해주세요.");
-			return;
-		}
-		
-		Todo todo = new Todo(loginMemCode, todoNo, completeYN);
+		Todo todo = new Todo(loginMemCode, todoNo);
 		
 		int result = service.updateCompleteYN(todo);
 		

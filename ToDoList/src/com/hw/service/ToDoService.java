@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import static com.hw.common.Template.*;
+
 import com.hw.model.dao.ToDoDAO;
 import com.hw.model.dto.Member;
 import com.hw.model.dto.Todo;
@@ -121,6 +122,10 @@ public class ToDoService {
 	public int updateCompleteYN(Todo todo) throws Exception {
 
 		Connection conn = getConnection();
+		
+		char completeYN = dao.selectCompleteYN(conn, todo);
+		
+		todo.setCompleteYN(completeYN);
 		
 		int result = dao.updateCompleteYN(conn, todo);
 		

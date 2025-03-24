@@ -32,10 +32,9 @@ public class Todo {
 		this.todoContent = todoContent;
 	}
 	
-	public Todo(int memCode, int todoNo, char completeYN) {
+	public Todo(int memCode, int todoNo) {
 		this.memCode = memCode;
 		this.todoNo = todoNo;
-		this.completeYN = completeYN;
 	}
 
 	@Override

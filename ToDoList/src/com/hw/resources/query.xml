@@ -20,6 +20,8 @@
 	
 	<entry key="updateTodo">UPDATE TB_TODO SET TODO_TITLE = ?, TODO_CONTENT = ?, UPDATED_DATE = DEFAULT WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
 
+	<entry key="selectCompleteYN">SELECT COMPLETE_YN FROM TB_TODO WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
+
 	<entry key="updateCompleteYN">UPDATE TB_TODO SET COMPLETE_YN = ? WHERE MEMBER_CODE = ? AND TODO_NO = ?</entry>
 
 </properties>
